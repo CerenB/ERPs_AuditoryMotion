@@ -158,34 +158,38 @@ for iEvent = 1:numEvents
     % fill the buffer 
     PsychPortAudio('FillBuffer',pahandle,Sound);                        
     
+    % assign trigger to which sound will be played
+    trigger = Event_order(iEvent);  
+    
     % send the trigger
     if strcmp(device,'eeg')
-        
-        % >>> consider to add a +10, ask Franci why
-
-        % assign trigger to which sound will be played     
-        trigger = Event_order(iEvent);   
+        % >>> consider to add a +10 to trigger, ask Franci why
         sendparallelbyte(trigger);
-        
-        % play the sound
-        playTime(1,iEvent) = PsychPortAudio('Start', pahandle, [],[],1,startEvent+(length(Sound)/freq));
-        
+    end
+    
+    %Play the sound
+    playTime(1,iEvent) = PsychPortAudio('Start', pahandle, [],[],1,startEvent+(length(Sound)/freq));
+    
+    
+    
+    
+    
+    
+    % get the onset time <---- Isn't it better to get the onset time from
+    % the output from PsychPortAudio('start') ?
+    eventOnsets(iEvent)=GetSecs-experimentStartTime;
+    
+    
+    
+    
+    
+    
+    if strcmp(device,'eeg')
         %reset the parallel port
         sendparallelbyte(0);
-        
-    else
-        
-        % assign trigger to which sound will be played anyway,it will go in
-        % the outputfile
-        trigger = Event_order(iEvent);   
-        
-        % get the onset time
-        eventOnsets(iEvent)=GetSecs-experimentStartTime;
-        
-        %Play the sound
-        playTime(1,iEvent) = PsychPortAudio('Start', pahandle, [],[],1,startEvent+(length(Sound)/freq));
-        
     end
+    
+
     
     % wait for the ISI and register the responseKey
     while (GetSecs-(playTime(1,iEvent)+(length(Sound)/freq))) <= (ISI(iEvent))
