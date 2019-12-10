@@ -1,5 +1,6 @@
 *.m~
 .DS_Store
 .Rhistory
+*.tsv
 *.mat
 sound_output

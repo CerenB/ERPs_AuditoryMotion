@@ -41,6 +41,15 @@ trigger.resp = 3;
 % wait time before sending trigger and resetting it
 trigger_delay = 0.1;
 
+% sound repetition
+repetitions = 1;
+
+% Start immediately (0 = immediately)
+startCue = 0;
+
+% Should we wait for the device to really start (1 = yes) 
+waitForDeviceStart = 1;
+
 
 %% Get input
 freq = audio_config.freq;
@@ -53,6 +62,12 @@ sound = audio_config.sound;
 
 switch action
     
+    case 'openParallelPort'
+        
+        if strcmp(device,'eeg')
+            openparallelport('D010');
+        end
+    
     case 'open'
         
         
@@ -62,9 +77,9 @@ switch action
 %                 openparallelport('D010');
 %             end
             
-            dev_n_channels = [];
+            dev_n_channels = 2;
             
-            pahandle = PsychPortAudio('Open', [], [], 1, freq, 2);
+            pahandle = PsychPortAudio('Open', [], [], 3, freq, dev_n_channels);
             
             audio_config.pahandle = pahandle;
             audio_config.dev_n_channels = dev_n_channels;
@@ -141,7 +156,7 @@ switch action
         
         pahandle = audio_config.pahandle;
         
-        playTime = PsychPortAudio('Start', pahandle, [],[], 1);
+        playTime = PsychPortAudio('Start', pahandle, repetitions, startCue, waitForDeviceStart);
         
         if any(strcmp(device,{'eeg'}))
             % send the trigger 
