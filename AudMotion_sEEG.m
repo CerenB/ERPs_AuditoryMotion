@@ -21,8 +21,8 @@ tic
 
 %% set trial or real experiment
 % device = 'eeg'; % any sound card, triggers through parallel port
-% device = 'RME_RCAtrig'; % works with RME sound card and sends one trigger value through RCA cable (trigger box)
-device = 'trial'; % any sound card, no triggers (parallel port not open)
+device = 'RME_RCAtrig'; % works with RME sound card and sends one trigger value through RCA cable (trigger box)
+% device = 'trial'; % any sound card, no triggers (parallel port not open)
 
 fprintf('Connected Device is %s \n\n',device);
 
@@ -64,7 +64,7 @@ Filename = fullfile(pwd, 'output', ...
     ['sub-' SubjName, ...
     '_run-' Run, ...
     '_case-n-' expLength, ...
-    '_' datestr(now, DateFormat) '.tsv']);
+    '_' datestr(now, DateFormat)]);
 
 % prepare for the output
 % ans 7 means that a directory exist
@@ -73,7 +73,7 @@ if exist('output', 'dir') ~= 7
 end
 
 % open a tsv file to write the output (for this script only)
-fid = fopen(Filename, 'a');
+fid = fopen([Filename '.tsv'], 'w');
 fprintf(fid, 'SubjID\tExp_trial\tCondition\tSoundfile\tTarget\tTrigger\tISI\tEvent_start\tEvent_end\tEvent_duration\tResponse\tRT\n');
 
 fprintf('Auditory ERPs \n\n')
@@ -268,6 +268,12 @@ for iEvent = 1:numEvents
         isTarget(Event_order(iEvent)), trigger, ISI(iEvent), ...
         timeLogger(iEvent).startTime, eventEnds(iEvent), eventDurations(iEvent), ...
         responseKey, responseTime);
+    
+        fprintf(1,'%s\t %d\t %s\t %s\t %d\t %d\t %f\t %f\t %f\t %f\t %s\t %f\n',...
+        SubjName, iEvent, condition{Event_order(iEvent)}, soundfiles{Event_order(iEvent)}, ...
+        isTarget(Event_order(iEvent)), trigger, ISI(iEvent), ...
+        timeLogger(iEvent).startTime, eventEnds(iEvent), eventDurations(iEvent), ...
+        responseKey, responseTime);
 
 
 end
@@ -313,8 +319,8 @@ Experiment_duration = GetSecs - experimentStartTime;
 
 %% Save a mat Log file
 % Onsets & durations are saved in seconds.
-save(fullfile(pwd, 'output', ['logFileFull_', SubjName, '_run-' Run,'_case-n-' expLength,'.mat']));
-save(fullfile(pwd, 'output', ['logFile_', SubjName, '_run-' Run,'_case-n-' expLength,'.mat']), ...
+save(fullfile(pwd, 'output', ['logFileFull_', SubjName, '_run-' Run,'_case-n-' expLength, '_', datestr(now, DateFormat), '.mat']));
+save(fullfile(pwd, 'output', ['logFile_', SubjName, '_run-' Run,'_case-n-' expLength, '_', datestr(now, DateFormat), '.mat']), ...
     'names', 'onsets', 'durations', 'ends', 'responseTime', ...
     'responseKey', 'Experiment_duration', 'playTime','timeLogger');
 
